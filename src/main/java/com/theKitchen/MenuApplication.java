@@ -1,6 +1,5 @@
 package com.theKitchen;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Scanner;
 
@@ -80,23 +79,12 @@ public class MenuApplication {
         // Future implementation for managing Pedidos
     }
 
-    public class GerenciamentoDePratos {
-    private PratoController pratoController;
-    private PratoView pratoView;
-    private Scanner scanner;
-
-    public GerenciamentoDePratos(PratoController pratoController, PratoView pratoView) {
-        this.pratoController = pratoController;
-        this.pratoView = pratoView;
-        this.scanner = new Scanner(System.in);
-    }
-
     public void gerenciarPratos() {
         int opcao;
         do {
             mostrarMenuPratos();
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Consumir a nova linha após nextInt()
+            scanner.nextLine();
             switch (opcao) {
                 case 1:
                     cadastrarPrato();
@@ -131,8 +119,12 @@ public class MenuApplication {
         pratoView.mostrarMensagem("Digite o preço do prato:");
         double preco = scanner.nextDouble();
         scanner.nextLine(); // Consumir a nova linha após nextDouble()
+        pratoView.mostrarMensagem("Digite a categoria:");
+        String categoria = scanner.nextLine();
+        pratoView.mostrarMensagem("Digite o tempo de preparo:");
+        Integer tempoPreparo = scanner.nextInt();
 
-        Prato novoPrato = new Prato(nome, composicao, preco);
+        Prato novoPrato = new Prato(nome, composicao, preco, categoria, tempoPreparo);
         String retorno = pratoController.cadastrarPrato(novoPrato);
         pratoView.mostrarMensagem(retorno);
     }
@@ -199,7 +191,6 @@ public class MenuApplication {
         pratoView.mostrarMensagem("===========================");
         pratoView.mostrarMensagem("Escolha uma opção:");
     }
-}
 
     private void gerenciarClientes() {
         int opcao;

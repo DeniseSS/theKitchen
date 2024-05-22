@@ -6,9 +6,9 @@ public class Prato extends AbstractEntity {
   private String composicao;
   private Double preco;
   private String categoria;
-  private String tempoPreparo;
+  private Integer tempoPreparo;
 
-  public Prato(String nomePrato, String composicao, Double preco, String categoria, String tempoPreparo) {
+  public Prato(String nomePrato, String composicao, Double preco, String categoria, Integer tempoPreparo) {
     this.nomePrato = nomePrato;
     this.composicao = composicao;
     this.preco = preco;
@@ -16,7 +16,7 @@ public class Prato extends AbstractEntity {
     this.tempoPreparo = tempoPreparo;
   }
 
-  public Prato(int id, String nomePrato, String composicao, Double preco, String categoria, String tempoPreparo) {
+  public Prato(int id, String nomePrato, String composicao, Double preco, String categoria, Integer tempoPreparo) {
     super.setId(id);
     this.nomePrato = nomePrato;
     this.composicao = composicao;
@@ -44,7 +44,9 @@ public class Prato extends AbstractEntity {
   public Double getPreco() {
     return preco;
   }
-
+  public void setPreco(double preco) {
+    this.preco = preco;
+  }
 
   public String getCategoria() {
     return categoria;
@@ -54,12 +56,14 @@ public class Prato extends AbstractEntity {
     this.categoria = categoria;
   }
 
-  public String getTempoPreparo() {
+  public Integer getTempoPreparo() {
     return tempoPreparo;
   }
 
-  public void setTempoPreparo(String tempoPreparo) {
+  public void setTempoPreparo(Integer tempoPreparo) {
     this.tempoPreparo = tempoPreparo;
   }
+
+  
 
 }

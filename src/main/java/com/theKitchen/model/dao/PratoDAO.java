@@ -20,7 +20,7 @@ public class PratoDAO implements IDAO<Prato> {
             statement.setString(2, entidade.getComposicao());
             statement.setDouble(3, entidade.getPreco());
             statement.setString(4, entidade.getCategoria());
-            statement.setString(5, entidade.getTempoPreparo());
+            statement.setInt(5, entidade.getTempoPreparo());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -36,7 +36,7 @@ public class PratoDAO implements IDAO<Prato> {
             statement.setString(2, entidade.getComposicao());
             statement.setDouble(3, entidade.getPreco());
             statement.setString(4, entidade.getCategoria());
-            statement.setString(5, entidade.getTempoPreparo());
+            statement.setInt(5, entidade.getTempoPreparo());
             statement.setInt(6, entidade.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -70,7 +70,7 @@ public class PratoDAO implements IDAO<Prato> {
                         resultSet.getString("composicao"),
                         resultSet.getDouble("preco"),
                         resultSet.getString("categoria"),
-                        resultSet.getString("tempo_preparo"));
+                        resultSet.getInt("tempo_preparo"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -90,7 +90,7 @@ public class PratoDAO implements IDAO<Prato> {
                         resultSet.getString("composicao"),
                         resultSet.getDouble("preco"),
                         resultSet.getString("categoria"),
-                        resultSet.getString("tempo_preparo"));
+                        resultSet.getInt("tempo_preparo"));
                 pratos.add(prato);
             }
         } catch (SQLException e) {
