@@ -6,12 +6,15 @@ import java.util.Scanner;
 import com.theKitchen.controller.ClienteController;
 import com.theKitchen.controller.FuncionarioController;
 import com.theKitchen.controller.PratoController;
+import com.theKitchen.controller.ItensController;
 import com.theKitchen.model.entity.Cliente;
 import com.theKitchen.model.entity.Funcionario;
+import com.theKitchen.model.entity.Itens;
 import com.theKitchen.model.entity.Prato;
 import com.theKitchen.view.ClienteView;
 import com.theKitchen.view.FuncionarioView;
 import com.theKitchen.view.PratoView;
+import com.theKitchen.view.ItensView;
 
 public class MenuApplication {
     private ClienteController clienteController;
@@ -20,11 +23,15 @@ public class MenuApplication {
     private FuncionarioView funcionarioView;
     private PratoView pratoView;
     private PratoController pratoController;
+
+    private ItensController itensController; 
+    private ItensView itensView;
     private Scanner scanner;
 
     public MenuApplication(ClienteController clienteController, ClienteView clienteView,
-            FuncionarioController funcionarioController, FuncionarioView funcionarioView, PratoView pratoView,
-            PratoController pratoController,
+            FuncionarioController funcionarioController, FuncionarioView funcionarioView,
+            PratoView pratoView, PratoController pratoController,
+            ItensController itensController, ItensView itensView, 
             Scanner scanner) {
         this.clienteController = clienteController;
         this.clienteView = clienteView;
@@ -32,6 +39,8 @@ public class MenuApplication {
         this.funcionarioView = funcionarioView;
         this.pratoController = pratoController;
         this.pratoView = pratoView;
+        this.itensController = itensController; 
+        this.itensView = itensView;
         this.scanner = scanner;
     }
 
@@ -53,6 +62,8 @@ public class MenuApplication {
                 case 4:
                     gerenciarFuncionarios();
                     break;
+                case 5:
+                    gerenciarItens();
                 case 0:
                     System.out.println("Saindo do sistema...");
                     break;
@@ -69,6 +80,7 @@ public class MenuApplication {
         System.out.println("2. Gerenciar Pratos");
         System.out.println("3. Gerenciar Clientes");
         System.out.println("4. Gerenciar Funcionarios");
+        System.out.println("5. Gerenciar itens");
         System.out.println("0. Sair");
         System.out.println("======================");
         System.out.print("Escolha uma opção: ");
@@ -77,6 +89,121 @@ public class MenuApplication {
     private void gerenciarPedidos() {
         System.out.println("Gerenciamento de Pedidos ainda não implementado.");
         // Future implementation for managing Pedidos
+    }
+
+    private void gerenciarItens() {
+        int opcao;
+        do {
+            mostrarMenuItens();
+            opcao = scanner.nextInt();
+            scanner.nextLine();
+            switch (opcao) {
+                case 1:
+                    cadastrarItem();
+                    break;
+                case 2:
+                    listarItens();
+                    break;
+                case 3:
+                    atualizarItem();
+                    break;
+                case 4:
+                    excluirItem();
+                    break;
+                case 5:
+                    buscarItem();
+                    break;
+                case 0:
+                    itensView.mostrarMensagem("Voltando ao menu principal...");
+                    break;
+                default:
+                    itensView.mostrarMensagem("Opção inválida!");
+                    break;
+            }
+        } while (opcao != 0);
+    }
+
+    private void mostrarMenuItens() {
+        itensView.mostrarMensagem("=== Menu Itens ===");
+        itensView.mostrarMensagem("1. Cadastrar Item");
+        itensView.mostrarMensagem("2. Listar Itens");
+        itensView.mostrarMensagem("3. Atualizar Item");
+        itensView.mostrarMensagem("4. Excluir Item");
+        itensView.mostrarMensagem("5. Buscar Item");
+        itensView.mostrarMensagem("0. Voltar ao Menu Principal");
+        itensView.mostrarMensagem("===========================");
+        itensView.mostrarMensagem("Escolha uma opção:");
+    }
+
+    private void cadastrarItem() {
+        itensView.mostrarMensagem("Digite o nome do item:");
+        String nome = scanner.nextLine();
+        itensView.mostrarMensagem("Digite o valor do item:");
+        double valor = scanner.nextDouble();
+        scanner.nextLine(); // Consumir a nova linha após nextDouble()
+        itensView.mostrarMensagem("Digite a categoria do item:");
+        String categoria = scanner.nextLine();
+        itensView.mostrarMensagem("Digite a marca do item:");
+        String marca = scanner.nextLine();
+
+        Itens novoItem = new Itens(nome, valor, categoria, marca);
+        String retorno = itensController.cadastrarItem(novoItem);
+        itensView.mostrarMensagem(retorno);
+    }
+
+    private void listarItens() {
+        itensView.mostrarMensagem("=== Itens Cadastrados ===");
+        List<Itens> itens = itensController.listarItens();
+        itensView.mostrarListaItens(itens);
+        itensView.mostrarMensagem("===========================");
+    }
+
+    private void atualizarItem() {
+        itensView.mostrarMensagem("Digite o ID do item a ser atualizado:");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        Itens item = itensController.buscarItem(id);
+        if (item != null) {
+            itensView.mostrarMensagem("Digite o novo nome do item:");
+            String nome = scanner.nextLine();
+            item.setNomeItem(nome);
+            itensView.mostrarMensagem("Digite o novo valor do item:");
+            double valor = scanner.nextDouble();
+            scanner.nextLine();
+            item.setValorItem(valor);
+            itensView.mostrarMensagem("Digite a nova categoria do item:");
+            String categoria = scanner.nextLine();
+            item.setCategoriaItem(categoria);
+            itensView.mostrarMensagem("Digite a nova marca do item:");
+            String marca = scanner.nextLine();
+            item.setMarca(marca);
+
+            String retorno = itensController.atualizarItem(item);
+            itensView.mostrarMensagem(retorno);
+        } else {
+            itensView.mostrarMensagem("Item não encontrado!");
+            
+        }
+    }
+
+    private void excluirItem() {
+        itensView.mostrarMensagem("Digite o ID do item a ser excluído:");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        String retorno = itensController.excluirItem(id);
+        itensView.mostrarMensagem(retorno);
+    }
+
+    private void buscarItem() {
+        itensView.mostrarMensagem("Digite o ID do item a ser buscado:");
+        int id = scanner.nextInt();
+        scanner.nextLine(); // Consumir a nova linha após nextInt()
+        Itens item = itensController.buscarItem(id);
+        if (item != null) {
+            itensView.mostrarDetalhesItem(item);
+        } else {
+            itensView.mostrarMensagem("Item não encontrado!");
+        }
     }
 
     public void gerenciarPratos() {
@@ -163,7 +290,7 @@ public class MenuApplication {
     private void excluirPrato() {
         pratoView.mostrarMensagem("Digite o ID do prato a ser excluído:");
         int id = scanner.nextInt();
-        scanner.nextLine(); // Consumir a nova linha após nextInt()
+        scanner.nextLine();
         String retorno = pratoController.excluirPrato(id);
         pratoView.mostrarMensagem(retorno);
     }
@@ -171,7 +298,7 @@ public class MenuApplication {
     private void buscarPrato() {
         pratoView.mostrarMensagem("Digite o ID do prato a ser buscado:");
         int id = scanner.nextInt();
-        scanner.nextLine(); // Consumir a nova linha após nextInt()
+        scanner.nextLine();
         Prato prato = pratoController.buscarPrato(id);
         if (prato != null) {
             pratoView.mostrarDetalhesPrato(prato);

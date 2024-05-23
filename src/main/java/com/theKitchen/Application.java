@@ -8,12 +8,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.theKitchen.controller.ClienteController;
 import com.theKitchen.controller.FuncionarioController;
+import com.theKitchen.controller.ItensController;
 import com.theKitchen.controller.PratoController;
 import com.theKitchen.model.dao.ClienteDAO;
 import com.theKitchen.model.dao.FuncionarioDAO;
+import com.theKitchen.model.dao.ItensDAO;
 import com.theKitchen.model.dao.PratoDAO;
 import com.theKitchen.view.ClienteView;
 import com.theKitchen.view.FuncionarioView;
+import com.theKitchen.view.ItensView;
 import com.theKitchen.view.PratoView;
 import com.theKitchen.config.DbConfig;
 
@@ -39,10 +42,14 @@ public class Application  implements CommandLineRunner {
         PratoDAO pratoDAO = new PratoDAO(); 
         PratoController pratoController = new PratoController(pratoDAO); 
 
+        ItensView itensView = new ItensView();
+        ItensDAO itensDAO = new ItensDAO();
+        ItensController itensController = new ItensController(itensDAO);
+
         DbConfig.testConnection();
 
         Scanner scanner = new Scanner(System.in);
-        MenuApplication sistema = new MenuApplication(clienteController, clienteView, funcionarioController, funcionarioView, pratoView, pratoController, scanner);
+        MenuApplication sistema = new MenuApplication(clienteController, clienteView, funcionarioController, funcionarioView, pratoView, pratoController, itensController, itensView, scanner);
 
         sistema.iniciar();
     }
