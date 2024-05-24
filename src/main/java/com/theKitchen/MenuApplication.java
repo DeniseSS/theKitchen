@@ -1,37 +1,43 @@
 package com.theKitchen;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Scanner;
 
 import com.theKitchen.controller.ClienteController;
 import com.theKitchen.controller.FuncionarioController;
-import com.theKitchen.controller.PratoController;
 import com.theKitchen.controller.ItensController;
+import com.theKitchen.controller.PedidoController;
+import com.theKitchen.controller.PratoController;
 import com.theKitchen.model.entity.Cliente;
 import com.theKitchen.model.entity.Funcionario;
 import com.theKitchen.model.entity.Itens;
+import com.theKitchen.model.entity.Pedido;
 import com.theKitchen.model.entity.Prato;
 import com.theKitchen.view.ClienteView;
 import com.theKitchen.view.FuncionarioView;
-import com.theKitchen.view.PratoView;
 import com.theKitchen.view.ItensView;
+import com.theKitchen.view.PedidoView;
+import com.theKitchen.view.PratoView;
 
 public class MenuApplication {
     private ClienteController clienteController;
     private ClienteView clienteView;
     private FuncionarioController funcionarioController;
     private FuncionarioView funcionarioView;
-    private PratoView pratoView;
     private PratoController pratoController;
-
-    private ItensController itensController; 
+    private PratoView pratoView;
+    private ItensController itensController;
     private ItensView itensView;
+    private PedidoController pedidoController;
+    private PedidoView pedidoView;
     private Scanner scanner;
 
     public MenuApplication(ClienteController clienteController, ClienteView clienteView,
             FuncionarioController funcionarioController, FuncionarioView funcionarioView,
-            PratoView pratoView, PratoController pratoController,
-            ItensController itensController, ItensView itensView, 
+            PratoController pratoController, PratoView pratoView,
+            ItensController itensController, ItensView itensView,
+            PedidoController pedidoController, PedidoView pedidoView,
             Scanner scanner) {
         this.clienteController = clienteController;
         this.clienteView = clienteView;
@@ -39,8 +45,10 @@ public class MenuApplication {
         this.funcionarioView = funcionarioView;
         this.pratoController = pratoController;
         this.pratoView = pratoView;
-        this.itensController = itensController; 
+        this.itensController = itensController;
         this.itensView = itensView;
+        this.pedidoController = pedidoController;
+        this.pedidoView = pedidoView;
         this.scanner = scanner;
     }
 
@@ -87,8 +95,158 @@ public class MenuApplication {
     }
 
     private void gerenciarPedidos() {
-        System.out.println("Gerenciamento de Pedidos ainda não implementado.");
-        // Future implementation for managing Pedidos
+        int opcao;
+        do {
+            mostrarMenuPedidos();
+            opcao = scanner.nextInt();
+            scanner.nextLine(); // Consumir a nova linha após nextInt()
+            switch (opcao) {
+                case 1:
+                    cadastrarPedido();
+                    break;
+                case 2:
+                    listarPedidos();
+                    break;
+                case 3:
+                    atualizarPedido();
+                    break;
+                case 4:
+                    excluirPedido();
+                    break;
+                case 5:
+                    buscarPedido();
+                    break;
+                case 0:
+                    pedidoView.mostrarMensagem("Voltando ao menu principal...");
+                    break;
+                default:
+                    pedidoView.mostrarMensagem("Opção inválida!");
+                    break;
+            }
+        } while (opcao != 0);
+    }
+
+    private void mostrarMenuPedidos() {
+        pedidoView.mostrarMensagem("=== Menu Pedidos ===");
+        pedidoView.mostrarMensagem("1. Cadastrar Pedido");
+        pedidoView.mostrarMensagem("2. Listar Pedidos");
+        pedidoView.mostrarMensagem("3. Atualizar Pedido");
+        pedidoView.mostrarMensagem("4. Excluir Pedido");
+        pedidoView.mostrarMensagem("5. Buscar Pedido");
+        pedidoView.mostrarMensagem("0. Voltar ao Menu Principal");
+        pedidoView.mostrarMensagem("===========================");
+        pedidoView.mostrarMensagem("Escolha uma opção:");
+    }
+
+    private void cadastrarPedido() {
+        listarClientes();
+        pedidoView.mostrarMensagem("Digite o ID do cliente:");
+        int clienteId = scanner.nextInt();
+        scanner.nextLine();
+
+        pedidoView.mostrarMensagem("Digite o status do pedido:");
+        String status = scanner.nextLine();
+
+        listarPratos();
+        pedidoView.mostrarMensagem("Digite o ID do prato:");
+        int pratoId = scanner.nextInt();
+        scanner.nextLine();
+
+        listarFuncionarios();
+        pedidoView.mostrarMensagem("Digite o ID do funcionario:");
+        int funcionarioId = scanner.nextInt();
+        scanner.nextLine();
+
+        pedidoView.mostrarMensagem("Digite a data e hora do pedido (YYYY-MM-DD HH:MM:SS):");
+        String dataHora = scanner.nextLine();
+        //Timestamp dataHora = Timestamp.valueOf(dataHoraStr);
+
+        pedidoView.mostrarMensagem("Digite o total do pedido:");
+        double total = scanner.nextDouble();
+        scanner.nextLine();
+
+        listarItens();
+        pedidoView.mostrarMensagem("Digite o ID do item:");
+        int itemId = scanner.nextInt();
+        scanner.nextLine();
+
+        Pedido pedido = new Pedido(0,clienteId, status, pratoId, funcionarioId, dataHora, total, itemId);
+        String retorno = pedidoController.cadastrarPedido(pedido);
+        pedidoView.mostrarMensagem(retorno);
+    }
+
+    private void listarPedidos() {
+        pedidoView.mostrarMensagem("=== Pedidos Cadastrados ===");
+        List<Pedido> pedidos = pedidoController.listarPedidos();
+        pedidoView.mostrarListaPedidos(pedidos);
+        pedidoView.mostrarMensagem("===========================");
+    }
+
+    private void atualizarPedido() {
+        pedidoView.mostrarMensagem("Digite o ID do pedido a ser atualizado:");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        Pedido pedido = pedidoController.buscarPedido(id);
+        if (pedido != null) {
+            pedidoView.mostrarMensagem("Digite o novo status do pedido:");
+            String status = scanner.nextLine();
+            pedido.setStatus(status);
+
+            pedidoView.mostrarMensagem("Digite a nova data e hora do pedido (YYYY-MM-DD HH:MM:SS):");
+            String dataHoraStr = scanner.nextLine();
+            //Timestamp dataHora = Timestamp.valueOf(dataHoraStr);
+            pedido.setDataHora(dataHoraStr);
+
+            pedidoView.mostrarMensagem("Digite o novo total do pedido:");
+            double total = scanner.nextDouble();
+            scanner.nextLine();
+            pedido.setTotal(total);
+
+            pedidoView.mostrarMensagem("Digite o novo ID do cliente:");
+            int clienteId = scanner.nextInt();
+            scanner.nextLine();
+            pedido.setCliente(clienteId);
+
+            pedidoView.mostrarMensagem("Digite o novo ID do prato:");
+            int pratoId = scanner.nextInt();
+            scanner.nextLine();
+            pedido.setPrato(pratoId);
+
+            pedidoView.mostrarMensagem("Digite o novo ID do funcionario:");
+            int funcionarioId = scanner.nextInt();
+            scanner.nextLine();
+            pedido.setFuncionario(funcionarioId);
+
+            pedidoView.mostrarMensagem("Digite o novo ID do item:");
+            int itemId = scanner.nextInt();
+            scanner.nextLine();
+            pedido.setItem(itemId);
+
+            String retorno = pedidoController.atualizarPedido(pedido);
+            pedidoView.mostrarMensagem(retorno);
+        } else {
+            pedidoView.mostrarMensagem("Pedido não encontrado!");
+        }
+    }
+
+    private void excluirPedido() {
+        pedidoView.mostrarMensagem("Digite o ID do pedido a ser excluído:");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        String retorno = pedidoController.excluirPedido(id);
+        pedidoView.mostrarMensagem(retorno);
+    }
+
+    private void buscarPedido() {
+        pedidoView.mostrarMensagem("Digite o ID do pedido a ser buscado:");
+        int id = scanner.nextInt();
+        scanner.nextLine(); // Consumir a nova linha após nextInt()
+        Pedido pedido = pedidoController.buscarPedido(id);
+        if (pedido != null) {
+            pedidoView.mostrarDetalhesPedido(pedido);
+        } else {
+            pedidoView.mostrarMensagem("Pedido não encontrado!");
+        }
     }
 
     private void gerenciarItens() {
@@ -182,7 +340,7 @@ public class MenuApplication {
             itensView.mostrarMensagem(retorno);
         } else {
             itensView.mostrarMensagem("Item não encontrado!");
-            
+
         }
     }
 
