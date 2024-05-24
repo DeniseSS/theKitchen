@@ -7,6 +7,7 @@ public class ItensView {
 
     public void mostrarDetalhesItem(Itens item) {
         System.out.println("Detalhes do item:");
+        System.out.println("ID: " + item.getId());
         System.out.println("Nome: " + item.getNomeItem());
         System.out.println("Valor: " + item.getValorItem());
         System.out.println("Categoria: " + item.getCategoriaItem());
@@ -16,7 +17,8 @@ public class ItensView {
     public void mostrarListaItens(List<Itens> itens) {
         System.out.println("Lista de itens:");
         for (Itens item : itens) {
-            System.out.println("Nome: " + item.getNomeItem() +
+            System.out.println("ID: " + item.getId()+
+                    ", Nome: " + item.getNomeItem() +
                     ", Valor: " + item.getValorItem() +
                     ", Categoria: " + item.getCategoriaItem() +
                     ", Marca: " + item.getMarca());

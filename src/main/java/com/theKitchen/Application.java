@@ -23,6 +23,9 @@ import com.theKitchen.view.PedidoView;
 import com.theKitchen.view.PratoView;
 import com.theKitchen.config.DbConfig;
 
+import com.theKitchen.controller.PedidoDetalhadoController;
+import com.theKitchen.view.PedidoDetalhadoView;
+
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
@@ -53,12 +56,15 @@ public class Application implements CommandLineRunner {
         PedidoDAO pedidoDAO = new PedidoDAO();
         PedidoController pedidoController = new PedidoController(pedidoDAO);
 
+        PedidoDetalhadoView pedidoDetalhadoView = new PedidoDetalhadoView();
+        PedidoDetalhadoController pedidoDetalhadoController = new PedidoDetalhadoController();
+
         DbConfig.testConnection();
 
         Scanner scanner = new Scanner(System.in);
         MenuApplication sistema = new MenuApplication(clienteController, clienteView, funcionarioController,
                 funcionarioView, pratoController, pratoView, itensController, itensView, pedidoController, pedidoView,
-                scanner);
+                scanner, pedidoDetalhadoController, pedidoDetalhadoView);
 
         sistema.iniciar();
     }

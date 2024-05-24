@@ -35,7 +35,7 @@ public class PedidoDAO implements IDAO<Pedido> {
     public void atualizar(Pedido pedido) {
         try (Connection connection = DbConfig.getConnection();
              PreparedStatement statement = connection.prepareStatement(
-                "UPDATE pedido SET cliente=?, status=?, prato=?, funcionario=?, data_hora=?, total=?, item=? WHERE id_pedido=?")) {
+                "UPDATE pedido SET fk_cliente=?, status=?, fk_prato=?, fk_funcionario=?, data_hora=?, total=?, fk_item=? WHERE id_pedido=?")) {
             statement.setInt(1, pedido.getCliente());
             statement.setString(2, pedido.getStatus());
             statement.setInt(3, pedido.getPrato());
@@ -71,13 +71,13 @@ public class PedidoDAO implements IDAO<Pedido> {
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 pedido = new Pedido(resultSet.getInt("id_pedido"),
-                        resultSet.getInt("cliente"),
+                        resultSet.getInt("fk_cliente"),
                         resultSet.getString("status"),
-                        resultSet.getInt("prato"),
-                        resultSet.getInt("funcionario"),
+                        resultSet.getInt("fk_prato"),
+                        resultSet.getInt("fk_uncionario"),
                         resultSet.getString("data_hora"), // Obtendo a data como string
                         resultSet.getDouble("total"),
-                        resultSet.getInt("item"));
+                        resultSet.getInt("fk_item"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -93,13 +93,13 @@ public class PedidoDAO implements IDAO<Pedido> {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Pedido pedido = new Pedido(resultSet.getInt("id_pedido"),
-                        resultSet.getInt("cliente"),
+                        resultSet.getInt("fk_cliente"),
                         resultSet.getString("status"),
-                        resultSet.getInt("prato"),
-                        resultSet.getInt("funcionario"),
+                        resultSet.getInt("fk_prato"),
+                        resultSet.getInt("fk_funcionario"),
                         resultSet.getString("data_hora"), // Obtendo a data como string
                         resultSet.getDouble("total"),
-                        resultSet.getInt("item"));
+                        resultSet.getInt("fk_item"));
                 pedidos.add(pedido);
             }
         } catch (SQLException e) {
@@ -107,4 +107,6 @@ public class PedidoDAO implements IDAO<Pedido> {
         }
         return pedidos;
     }
+
+    
 }

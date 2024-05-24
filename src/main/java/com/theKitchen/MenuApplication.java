@@ -1,6 +1,4 @@
 package com.theKitchen;
-
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Scanner;
 
@@ -20,7 +18,12 @@ import com.theKitchen.view.ItensView;
 import com.theKitchen.view.PedidoView;
 import com.theKitchen.view.PratoView;
 
+import com.theKitchen.controller.PedidoDetalhadoController;
+import com.theKitchen.model.entity.PedidoDetalhado;
+import com.theKitchen.view.PedidoDetalhadoView;
+
 public class MenuApplication {
+
     private ClienteController clienteController;
     private ClienteView clienteView;
     private FuncionarioController funcionarioController;
@@ -31,14 +34,17 @@ public class MenuApplication {
     private ItensView itensView;
     private PedidoController pedidoController;
     private PedidoView pedidoView;
+    private PedidoDetalhadoController pedidoDetalhadoController;
+    private PedidoDetalhadoView pedidoDetalhadoView;
     private Scanner scanner;
 
-    public MenuApplication(ClienteController clienteController, ClienteView clienteView,
-            FuncionarioController funcionarioController, FuncionarioView funcionarioView,
-            PratoController pratoController, PratoView pratoView,
-            ItensController itensController, ItensView itensView,
-            PedidoController pedidoController, PedidoView pedidoView,
-            Scanner scanner) {
+    public MenuApplication(ClienteController clienteController, ClienteView clienteView, 
+                           FuncionarioController funcionarioController, FuncionarioView funcionarioView, 
+                           PratoController pratoController, PratoView pratoView, 
+                           ItensController itensController, ItensView itensView, 
+                           PedidoController pedidoController, PedidoView pedidoView, 
+                           Scanner scanner, PedidoDetalhadoController pedidoDetalhadoController,
+                           PedidoDetalhadoView pedidoDetalhadoView) {
         this.clienteController = clienteController;
         this.clienteView = clienteView;
         this.funcionarioController = funcionarioController;
@@ -49,9 +55,10 @@ public class MenuApplication {
         this.itensView = itensView;
         this.pedidoController = pedidoController;
         this.pedidoView = pedidoView;
+        this.pedidoDetalhadoController = pedidoDetalhadoController;
+        this.pedidoDetalhadoView = pedidoDetalhadoView;
         this.scanner = scanner;
     }
-
     public void iniciar() {
         int opcao;
         do {
@@ -105,7 +112,7 @@ public class MenuApplication {
                     cadastrarPedido();
                     break;
                 case 2:
-                    listarPedidos();
+                    listarPedidosDetalhados();
                     break;
                 case 3:
                     atualizarPedido();
@@ -139,23 +146,30 @@ public class MenuApplication {
     }
 
     private void cadastrarPedido() {
+
+        listarFuncionarios();
+        pedidoView.mostrarMensagem("Digite o ID do funcionario:");
+        int funcionarioId = scanner.nextInt();
+        scanner.nextLine();
+
         listarClientes();
         pedidoView.mostrarMensagem("Digite o ID do cliente:");
         int clienteId = scanner.nextInt();
         scanner.nextLine();
-
-        pedidoView.mostrarMensagem("Digite o status do pedido:");
-        String status = scanner.nextLine();
 
         listarPratos();
         pedidoView.mostrarMensagem("Digite o ID do prato:");
         int pratoId = scanner.nextInt();
         scanner.nextLine();
 
-        listarFuncionarios();
-        pedidoView.mostrarMensagem("Digite o ID do funcionario:");
-        int funcionarioId = scanner.nextInt();
+        listarItens();
+        pedidoView.mostrarMensagem("Informe o item que deseja incluir:");
+        int itemId = scanner.nextInt();
         scanner.nextLine();
+
+        pedidoView.mostrarMensagem("Digite o status do pedido:");
+        String status = scanner.nextLine();
+
 
         pedidoView.mostrarMensagem("Digite a data e hora do pedido (YYYY-MM-DD HH:MM:SS):");
         String dataHora = scanner.nextLine();
@@ -165,21 +179,20 @@ public class MenuApplication {
         double total = scanner.nextDouble();
         scanner.nextLine();
 
-        listarItens();
-        pedidoView.mostrarMensagem("Digite o ID do item:");
-        int itemId = scanner.nextInt();
-        scanner.nextLine();
-
         Pedido pedido = new Pedido(0,clienteId, status, pratoId, funcionarioId, dataHora, total, itemId);
         String retorno = pedidoController.cadastrarPedido(pedido);
         pedidoView.mostrarMensagem(retorno);
     }
 
-    private void listarPedidos() {
+    /*private void listarPedidos() {
         pedidoView.mostrarMensagem("=== Pedidos Cadastrados ===");
         List<Pedido> pedidos = pedidoController.listarPedidos();
         pedidoView.mostrarListaPedidos(pedidos);
         pedidoView.mostrarMensagem("===========================");
+    }*/
+    private void listarPedidosDetalhados() {
+        List<PedidoDetalhado> pedidos = pedidoDetalhadoController.listarPedidosDetalhados();
+        pedidoDetalhadoView.mostrarListaPedidos(pedidos);
     }
 
     private void atualizarPedido() {
