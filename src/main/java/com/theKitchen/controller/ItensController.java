@@ -34,4 +34,5 @@ public class ItensController {
   public List<Itens> listarItens() {
     return itemDAO.listar();
   }
+
 }

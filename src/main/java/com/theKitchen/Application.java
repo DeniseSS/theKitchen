@@ -9,12 +9,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.theKitchen.controller.ClienteController;
 import com.theKitchen.controller.FuncionarioController;
 import com.theKitchen.controller.ItensController;
+import com.theKitchen.controller.ObterValorController;
 import com.theKitchen.controller.PratoController;
 import com.theKitchen.controller.PedidoController;
 import com.theKitchen.model.dao.ClienteDAO;
 import com.theKitchen.model.dao.FuncionarioDAO;
 import com.theKitchen.model.dao.ItensDAO;
+import com.theKitchen.model.dao.ObterValorDAO;
 import com.theKitchen.model.dao.PedidoDAO;
+import com.theKitchen.model.dao.PedidoDetalhadoDAO;
 import com.theKitchen.model.dao.PratoDAO;
 import com.theKitchen.view.ClienteView;
 import com.theKitchen.view.FuncionarioView;
@@ -57,14 +60,18 @@ public class Application implements CommandLineRunner {
         PedidoController pedidoController = new PedidoController(pedidoDAO);
 
         PedidoDetalhadoView pedidoDetalhadoView = new PedidoDetalhadoView();
-        PedidoDetalhadoController pedidoDetalhadoController = new PedidoDetalhadoController();
+        PedidoDetalhadoDAO pedidoDetalhadoDAO = new PedidoDetalhadoDAO();
+        PedidoDetalhadoController pedidoDetalhadoController = new PedidoDetalhadoController(pedidoDetalhadoDAO, pedidoDetalhadoView);
+
+        ObterValorDAO obterValorDAO = new ObterValorDAO();
+        ObterValorController obterValorController = new ObterValorController(obterValorDAO );
 
         DbConfig.testConnection();
 
         Scanner scanner = new Scanner(System.in);
         MenuApplication sistema = new MenuApplication(clienteController, clienteView, funcionarioController,
                 funcionarioView, pratoController, pratoView, itensController, itensView, pedidoController, pedidoView,
-                scanner, pedidoDetalhadoController, pedidoDetalhadoView);
+                scanner, pedidoDetalhadoController, pedidoDetalhadoView, obterValorController);
 
         sistema.iniciar();
     }

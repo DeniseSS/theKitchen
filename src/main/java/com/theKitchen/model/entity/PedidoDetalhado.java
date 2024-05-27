@@ -1,23 +1,24 @@
 package com.theKitchen.model.entity;
 
+import java.util.List;
+
 public class PedidoDetalhado {
     private int idPedido;
     private String nomeCliente;
     private String status;
-    private String nomePrato;
-    private String item;
+    private List<String> nomesPratos;
+    private List<String> nomesItens;
     private String nomeFuncionario;
     private String dataHora;
     private double total;
 
-
     // Construtor
-    public PedidoDetalhado(int idPedido, String nomeCliente, String status, String nomePrato, String item, String nomeFuncionario, String dataHora, double total) {
+    public PedidoDetalhado(int idPedido, String nomeCliente, String status, List<String> nomesPratos, List<String> nomesItens, String nomeFuncionario, String dataHora, double total) {
         this.idPedido = idPedido;
         this.nomeCliente = nomeCliente;
         this.status = status;
-        this.nomePrato = nomePrato;
-        this.item = item;
+        this.nomesPratos = nomesPratos;
+        this.nomesItens = nomesItens;
         this.nomeFuncionario = nomeFuncionario;
         this.dataHora = dataHora;
         this.total = total;
@@ -48,19 +49,20 @@ public class PedidoDetalhado {
         this.status = status;
     }
 
-    public String getNomePrato() {
-        return nomePrato;
+    public List<String> getNomesPratos() {
+        return nomesPratos;
     }
 
-    public void setNomePrato(String nomePrato) {
-        this.nomePrato = nomePrato;
-    }
-    public String getNomeItem() {
-        return item;
+    public void setNomesPratos(List<String> nomesPratos) {
+        this.nomesPratos = nomesPratos;
     }
 
-    public void setItem(String item) {
-        this.item = item;
+    public List<String> getNomesItens() {
+        return nomesItens;
+    }
+
+    public void setNomesItens(List<String> nomesItens) {
+        this.nomesItens = nomesItens;
     }
 
     public String getNomeFuncionario() {
@@ -78,7 +80,6 @@ public class PedidoDetalhado {
     public void setDataHora(String dataHora) {
         this.dataHora = dataHora;
     }
-
 
     public double getTotal() {
         return total;

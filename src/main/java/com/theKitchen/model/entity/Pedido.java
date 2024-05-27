@@ -1,26 +1,28 @@
 package com.theKitchen.model.entity;
 
+import java.util.List;
+
 public class Pedido extends AbstractEntity {
 
     private int idPedido;
     private int cliente;
     private String status;
-    private int prato;
+    private List<Integer> pratos;
     private int funcionario;
     private String dataHora;
     private double total;
-    private int item;
+    private List<Integer> itens;
 
-    public Pedido(int idPedido, int cliente, String status, int prato, int funcionario, String dataHora, double total,
-            int item) {
+    public Pedido(int idPedido, int cliente, String status, List<Integer> pratos, int funcionario, String dataHora, double total,
+            List<Integer> itens) {
         this.idPedido = idPedido;
         this.cliente = cliente;
         this.status = status;
-        this.prato = prato;
+        this.pratos = pratos;
         this.funcionario = funcionario;
         this.dataHora = dataHora;
         this.total = total;
-        this.item = item;
+        this.itens = itens;
     }
 
     public int getIdPedido() {
@@ -47,12 +49,12 @@ public class Pedido extends AbstractEntity {
         this.status = status;
     }
 
-    public int getPrato() {
-        return prato;
+    public List<Integer> getPratos() {
+        return pratos;
     }
 
-    public void setPrato(int prato) {
-        this.prato = prato;
+    public void setPratos(List<Integer> pratos) {
+        this.pratos = pratos;
     }
 
     public int getFuncionario() {
@@ -79,11 +81,11 @@ public class Pedido extends AbstractEntity {
         this.total = total;
     }
 
-    public int getItem() {
-        return item;
+    public List<Integer> getItens() {
+        return itens;
     }
 
-    public void setItem(int item) {
-        this.item = item;
+    public void setItens(List<Integer> itens) {
+        this.itens = itens;
     }
 }

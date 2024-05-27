@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.theKitchen.model.entity.AbstractEntity;
 
-public interface IDAO<T extends AbstractEntity> {
+public interface IDAO<T extends AbstractEntity>  {
 
   void cadastrar(T entidade);
 

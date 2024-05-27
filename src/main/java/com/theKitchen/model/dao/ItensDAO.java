@@ -15,8 +15,8 @@ public class ItensDAO implements IDAO<Itens> {
     @Override
     public void cadastrar(Itens item) {
         try (Connection connection = DbConfig.getConnection();
-             PreparedStatement statement = connection.prepareStatement(
-                     "INSERT INTO itens (nome_item, valor, categoria, marca) VALUES (?, ?, ?, ?)")) {
+                PreparedStatement statement = connection.prepareStatement(
+                        "INSERT INTO itens (nome_item, valor, categoria, marca) VALUES (?, ?, ?, ?)")) {
             statement.setString(1, item.getNomeItem());
             statement.setDouble(2, item.getValorItem());
             statement.setString(3, item.getCategoriaItem());
@@ -30,8 +30,8 @@ public class ItensDAO implements IDAO<Itens> {
     @Override
     public void atualizar(Itens item) {
         try (Connection connection = DbConfig.getConnection();
-             PreparedStatement statement = connection.prepareStatement(
-                     "UPDATE itens SET nome_item=?, valor=?, categoria=?, marca=? WHERE id_item=?")) {
+                PreparedStatement statement = connection.prepareStatement(
+                        "UPDATE itens SET nome_item=?, valor=?, categoria=?, marca=? WHERE id_item=?")) {
             statement.setString(1, item.getNomeItem());
             statement.setDouble(2, item.getValorItem());
             statement.setString(3, item.getCategoriaItem());
@@ -46,8 +46,8 @@ public class ItensDAO implements IDAO<Itens> {
     @Override
     public void excluir(int id) {
         try (Connection connection = DbConfig.getConnection();
-             PreparedStatement statement = connection
-                     .prepareStatement("DELETE FROM itens WHERE id_item=?")) {
+                PreparedStatement statement = connection
+                        .prepareStatement("DELETE FROM itens WHERE id_item=?")) {
             statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -59,8 +59,8 @@ public class ItensDAO implements IDAO<Itens> {
     public Itens buscar(int id) {
         Itens item = null;
         try (Connection connection = DbConfig.getConnection();
-             PreparedStatement statement = connection
-                     .prepareStatement("SELECT * FROM itens WHERE id_item=?")) {
+                PreparedStatement statement = connection
+                        .prepareStatement("SELECT * FROM itens WHERE id_item=?")) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -80,7 +80,7 @@ public class ItensDAO implements IDAO<Itens> {
     public List<Itens> listar() {
         List<Itens> items = new ArrayList<>();
         try (Connection connection = DbConfig.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM itens")) {
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM itens")) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Itens item = new Itens(resultSet.getInt("id_item"),
@@ -95,4 +95,7 @@ public class ItensDAO implements IDAO<Itens> {
         }
         return items;
     }
+
+   
+    
 }

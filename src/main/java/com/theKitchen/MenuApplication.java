@@ -1,12 +1,18 @@
 package com.theKitchen;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import com.theKitchen.controller.ClienteController;
 import com.theKitchen.controller.FuncionarioController;
 import com.theKitchen.controller.ItensController;
+import com.theKitchen.controller.ObterValorController;
 import com.theKitchen.controller.PedidoController;
 import com.theKitchen.controller.PratoController;
+import com.theKitchen.model.dao.ObterValorDAO;
 import com.theKitchen.model.entity.Cliente;
 import com.theKitchen.model.entity.Funcionario;
 import com.theKitchen.model.entity.Itens;
@@ -36,15 +42,16 @@ public class MenuApplication {
     private PedidoView pedidoView;
     private PedidoDetalhadoController pedidoDetalhadoController;
     private PedidoDetalhadoView pedidoDetalhadoView;
+    private ObterValorController obterValorController;
     private Scanner scanner;
 
-    public MenuApplication(ClienteController clienteController, ClienteView clienteView, 
-                           FuncionarioController funcionarioController, FuncionarioView funcionarioView, 
-                           PratoController pratoController, PratoView pratoView, 
-                           ItensController itensController, ItensView itensView, 
-                           PedidoController pedidoController, PedidoView pedidoView, 
-                           Scanner scanner, PedidoDetalhadoController pedidoDetalhadoController,
-                           PedidoDetalhadoView pedidoDetalhadoView) {
+    public MenuApplication(ClienteController clienteController, ClienteView clienteView,
+            FuncionarioController funcionarioController, FuncionarioView funcionarioView,
+            PratoController pratoController, PratoView pratoView,
+            ItensController itensController, ItensView itensView,
+            PedidoController pedidoController, PedidoView pedidoView,
+            Scanner scanner, PedidoDetalhadoController pedidoDetalhadoController,
+            PedidoDetalhadoView pedidoDetalhadoView, ObterValorController obterValorController) {
         this.clienteController = clienteController;
         this.clienteView = clienteView;
         this.funcionarioController = funcionarioController;
@@ -57,8 +64,11 @@ public class MenuApplication {
         this.pedidoView = pedidoView;
         this.pedidoDetalhadoController = pedidoDetalhadoController;
         this.pedidoDetalhadoView = pedidoDetalhadoView;
+        this.obterValorController = new ObterValorController(new ObterValorDAO());
         this.scanner = scanner;
+
     }
+
     public void iniciar() {
         int opcao;
         do {
@@ -106,7 +116,7 @@ public class MenuApplication {
         do {
             mostrarMenuPedidos();
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Consumir a nova linha após nextInt()
+            scanner.nextLine();
             switch (opcao) {
                 case 1:
                     cadastrarPedido();
@@ -157,39 +167,108 @@ public class MenuApplication {
         int clienteId = scanner.nextInt();
         scanner.nextLine();
 
-        listarPratos();
-        pedidoView.mostrarMensagem("Digite o ID do prato:");
-        int pratoId = scanner.nextInt();
-        scanner.nextLine();
+        List<Integer> itensSelecionados = new ArrayList<>();
+        List<Integer> pratosSelecionados = new ArrayList<>();
 
-        listarItens();
-        pedidoView.mostrarMensagem("Informe o item que deseja incluir:");
-        int itemId = scanner.nextInt();
-        scanner.nextLine();
+        boolean continuarPedido = true;
 
-        pedidoView.mostrarMensagem("Digite o status do pedido:");
-        String status = scanner.nextLine();
+        while (continuarPedido) {
+            boolean adicionarPrato = true;
+            while (adicionarPrato) {
+                listarPratos();
+                pedidoView.mostrarMensagem("Digite o ID do prato:");
+                int pratoId = scanner.nextInt();
+                scanner.nextLine();
+                pratosSelecionados.add(pratoId);
 
+                pedidoView.mostrarMensagem("Deseja adicionar mais pratos ao pedido? (S/N)");
+                String continuar = scanner.nextLine().toUpperCase();
+                if (!continuar.equals("S")) {
+                    adicionarPrato = false;
+                }
+            }
 
-        pedidoView.mostrarMensagem("Digite a data e hora do pedido (YYYY-MM-DD HH:MM:SS):");
-        String dataHora = scanner.nextLine();
-        //Timestamp dataHora = Timestamp.valueOf(dataHoraStr);
+            boolean adicionarItem = true;
+            while (adicionarItem) {
+                listarItens();
+                pedidoView.mostrarMensagem("Informe o item que deseja incluir:");
+                int itemId = scanner.nextInt();
+                scanner.nextLine();
+                itensSelecionados.add(itemId);
 
-        pedidoView.mostrarMensagem("Digite o total do pedido:");
-        double total = scanner.nextDouble();
-        scanner.nextLine();
+                pedidoView.mostrarMensagem("Deseja adicionar mais itens ao pedido? (S/N)");
+                String continuar = scanner.nextLine().toUpperCase();
+                if (!continuar.equals("S")) {
+                    adicionarItem = false;
+                }
+            }
 
-        Pedido pedido = new Pedido(0,clienteId, status, pratoId, funcionarioId, dataHora, total, itemId);
+            pedidoView.mostrarMensagem("Deseja continuar adicionando mais itens e pratos ao pedido? (S/N)");
+            String continuar = scanner.nextLine().toUpperCase();
+            if (!continuar.equals("S")) {
+                continuarPedido = false;
+            }
+        }
+
+        double totalItem = 0;
+        double totalPrato = 0;
+
+        for (int itemId : itensSelecionados) {
+            double valorItem = obterValorController.obterValorItem(itemId);
+            totalItem += valorItem;
+        }
+
+        for (int pratoId : pratosSelecionados) {
+            double valorPrato = obterValorController.obterValorPrato(pratoId);
+            totalPrato += valorPrato;
+        }
+
+        double total = totalPrato + totalItem;
+
+        pedidoView.mostrarMensagem("O valor total dos itens é: " + totalItem);
+        pedidoView.mostrarMensagem("O valor total dos pratos é: " + totalPrato);
+        pedidoView.mostrarMensagem("O valor total do pedido é: " + total);
+
+        System.out.println("___________________________________________");
+        LocalDateTime dataHoraAtual = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        String dataHora = dataHoraAtual.format(formatter);
+        System.out.println("Horario: " + dataHora);
+        System.out.println("___________________________________________");
+
+        System.out.println("Digite o número do status do pedido:");
+        System.out.println("1 = Em preparo");
+        System.out.println("2 = Pronto");
+        System.out.println("3 = Entregue");
+        System.out.println("4 = Cancelado");
+
+        int Escolhastatus = scanner.nextInt();
+        String status;
+
+        switch (Escolhastatus) {
+            case 1:
+                status = "Em preparo";
+                break;
+            case 2:
+                status = "Pronto";
+                break;
+            case 3:
+                status = "Entregue";
+                break;
+            case 4:
+                status = "Cancelado";
+                break;
+            default:
+                status = "Número inválido. Por favor, digite um número entre 1 e 4.";
+                break;
+        }
+
+        Pedido pedido = new Pedido(0, clienteId, status, pratosSelecionados, funcionarioId, dataHora, total,
+                itensSelecionados);
         String retorno = pedidoController.cadastrarPedido(pedido);
         pedidoView.mostrarMensagem(retorno);
     }
 
-    /*private void listarPedidos() {
-        pedidoView.mostrarMensagem("=== Pedidos Cadastrados ===");
-        List<Pedido> pedidos = pedidoController.listarPedidos();
-        pedidoView.mostrarListaPedidos(pedidos);
-        pedidoView.mostrarMensagem("===========================");
-    }*/
     private void listarPedidosDetalhados() {
         List<PedidoDetalhado> pedidos = pedidoDetalhadoController.listarPedidosDetalhados();
         pedidoDetalhadoView.mostrarListaPedidos(pedidos);
@@ -201,39 +280,117 @@ public class MenuApplication {
         scanner.nextLine();
         Pedido pedido = pedidoController.buscarPedido(id);
         if (pedido != null) {
-            pedidoView.mostrarMensagem("Digite o novo status do pedido:");
-            String status = scanner.nextLine();
-            pedido.setStatus(status);
-
-            pedidoView.mostrarMensagem("Digite a nova data e hora do pedido (YYYY-MM-DD HH:MM:SS):");
-            String dataHoraStr = scanner.nextLine();
-            //Timestamp dataHora = Timestamp.valueOf(dataHoraStr);
-            pedido.setDataHora(dataHoraStr);
-
-            pedidoView.mostrarMensagem("Digite o novo total do pedido:");
-            double total = scanner.nextDouble();
+            listarFuncionarios();
+            pedidoView.mostrarMensagem("Digite o novo ID do funcionário:");
+            int funcionarioId = scanner.nextInt();
             scanner.nextLine();
-            pedido.setTotal(total);
 
+            listarClientes();
             pedidoView.mostrarMensagem("Digite o novo ID do cliente:");
             int clienteId = scanner.nextInt();
             scanner.nextLine();
+
+            List<Integer> itensSelecionados = new ArrayList<>();
+            List<Integer> pratosSelecionados = new ArrayList<>();
+
+            boolean continuarPedido = true;
+
+            while (continuarPedido) {
+                boolean adicionarPrato = true;
+                while (adicionarPrato) {
+                    listarPratos();
+                    pedidoView.mostrarMensagem("Digite o ID do novo prato:");
+                    int pratoId = scanner.nextInt();
+                    scanner.nextLine();
+                    pratosSelecionados.add(pratoId);
+
+                    pedidoView.mostrarMensagem("Deseja adicionar mais pratos ao pedido? (S/N)");
+                    String continuar = scanner.nextLine().toUpperCase();
+                    if (!continuar.equals("S")) {
+                        adicionarPrato = false;
+                    }
+                }
+
+                boolean adicionarItem = true;
+                while (adicionarItem) {
+                    listarItens();
+                    pedidoView.mostrarMensagem("Informe o novo item que deseja incluir:");
+                    int itemId = scanner.nextInt();
+                    scanner.nextLine();
+                    itensSelecionados.add(itemId);
+
+                    pedidoView.mostrarMensagem("Deseja adicionar mais itens ao pedido? (S/N)");
+                    String continuar = scanner.nextLine().toUpperCase();
+                    if (!continuar.equals("S")) {
+                        adicionarItem = false;
+                    }
+                }
+
+                pedidoView.mostrarMensagem("Deseja continuar adicionando mais itens e pratos ao pedido? (S/N)");
+                String continuar = scanner.nextLine().toUpperCase();
+                if (!continuar.equals("S")) {
+                    continuarPedido = false;
+                }
+            }
+
+            double totalItem = 0;
+            double totalPrato = 0;
+
+            for (int itemId : itensSelecionados) {
+                double valorItem = obterValorController.obterValorItem(itemId);
+                totalItem += valorItem;
+            }
+
+            for (int pratoId : pratosSelecionados) {
+                double valorPrato = obterValorController.obterValorPrato(pratoId);
+                totalPrato += valorPrato;
+            }
+
+            double total = totalPrato + totalItem;
+
+            pedidoView.mostrarMensagem("O valor total dos itens é: " + totalItem);
+            pedidoView.mostrarMensagem("O valor total dos pratos é: " + totalPrato);
+            pedidoView.mostrarMensagem("O valor total do pedido é: " + total);
+
+            System.out.println("___________________________________________");
+            LocalDateTime dataHoraAtual = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            String dataHora = dataHoraAtual.format(formatter);
+            System.out.println("Horario: " + dataHora);
+            System.out.println("___________________________________________");
+
+            pedidoView.mostrarMensagem("Digite o novo número do status do pedido:");
+            pedidoView.mostrarMensagem("1 = Em preparo");
+            pedidoView.mostrarMensagem("2 = Pronto");
+            pedidoView.mostrarMensagem("3 = Entregue");
+            pedidoView.mostrarMensagem("4 = Cancelado");
+
+            int Escolhastatus = scanner.nextInt();
+            String status;
+
+            switch (Escolhastatus) {
+                case 1:
+                    status = "Em preparo";
+                    break;
+                case 2:
+                    status = "Pronto";
+                    break;
+                case 3:
+                    status = "Entregue";
+                    break;
+                case 4:
+                    status = "Cancelado";
+                    break;
+                default:
+                    status = "Número inválido. Por favor, digite um número entre 1 e 4.";
+                    break;
+            }
+
+            pedido.setStatus(status);
+            pedido.setDataHora(dataHora);
+            pedido.setTotal(total);
             pedido.setCliente(clienteId);
-
-            pedidoView.mostrarMensagem("Digite o novo ID do prato:");
-            int pratoId = scanner.nextInt();
-            scanner.nextLine();
-            pedido.setPrato(pratoId);
-
-            pedidoView.mostrarMensagem("Digite o novo ID do funcionario:");
-            int funcionarioId = scanner.nextInt();
-            scanner.nextLine();
             pedido.setFuncionario(funcionarioId);
-
-            pedidoView.mostrarMensagem("Digite o novo ID do item:");
-            int itemId = scanner.nextInt();
-            scanner.nextLine();
-            pedido.setItem(itemId);
 
             String retorno = pedidoController.atualizarPedido(pedido);
             pedidoView.mostrarMensagem(retorno);
@@ -253,13 +410,8 @@ public class MenuApplication {
     private void buscarPedido() {
         pedidoView.mostrarMensagem("Digite o ID do pedido a ser buscado:");
         int id = scanner.nextInt();
-        scanner.nextLine(); // Consumir a nova linha após nextInt()
-        Pedido pedido = pedidoController.buscarPedido(id);
-        if (pedido != null) {
-            pedidoView.mostrarDetalhesPedido(pedido);
-        } else {
-            pedidoView.mostrarMensagem("Pedido não encontrado!");
-        }
+        scanner.nextLine();
+        pedidoDetalhadoController.buscarPedidoDetalhadoPorId(id);
     }
 
     private void gerenciarItens() {
@@ -311,7 +463,7 @@ public class MenuApplication {
         String nome = scanner.nextLine();
         itensView.mostrarMensagem("Digite o valor do item:");
         double valor = scanner.nextDouble();
-        scanner.nextLine(); // Consumir a nova linha após nextDouble()
+        scanner.nextLine();
         itensView.mostrarMensagem("Digite a categoria do item:");
         String categoria = scanner.nextLine();
         itensView.mostrarMensagem("Digite a marca do item:");
@@ -368,7 +520,7 @@ public class MenuApplication {
     private void buscarItem() {
         itensView.mostrarMensagem("Digite o ID do item a ser buscado:");
         int id = scanner.nextInt();
-        scanner.nextLine(); // Consumir a nova linha após nextInt()
+        scanner.nextLine();
         Itens item = itensController.buscarItem(id);
         if (item != null) {
             itensView.mostrarDetalhesItem(item);
@@ -416,7 +568,7 @@ public class MenuApplication {
         String composicao = scanner.nextLine();
         pratoView.mostrarMensagem("Digite o preço do prato:");
         double preco = scanner.nextDouble();
-        scanner.nextLine(); // Consumir a nova linha após nextDouble()
+        scanner.nextLine();
         pratoView.mostrarMensagem("Digite a categoria:");
         String categoria = scanner.nextLine();
         pratoView.mostrarMensagem("Digite o tempo de preparo:");
